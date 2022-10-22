@@ -1,0 +1,22 @@
+This ia basically a react app, it helps you to create your resume based on you needs.
+Livedemo - https://resume-builder-al.netlify.app
+
+
+Tech information :-
+
+React 
+    - for structuring the website.
+React router dom 
+    - for routing through the web.
+React-avatar-edit 
+    - for selecting the user image for resume.
+Redux 
+    - for managing data.
+Material ui 
+    - for styling website.
+Localstorage 
+    - for storing resume on user-end.
+Js Pdf 
+    - for downloading the resume.
+
+This website has the functionality of edit, delete & download.
