@@ -57,37 +57,8 @@ Date: 3 Aug 25
 1. Serverless function doesnt mean, it doesnt need a server to run, it meanse you dont have to create or manage the servers to run it.
 2. lamda functions need basic logging permissions to get the logs of console.log into cloudwatch logs.
 3. you need to publish a new version of the lambda function (other than just deploying it), for others to access it.
-
-{
-    "Version": "2008-10-17",
-    "Id": "PolicyForCloudFrontPrivateContent",
-    "Statement": [
-        {
-            "Sid": "AllowCloudFrontServicePrincipal",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "cloudfront.amazonaws.com"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::edgenest-output/*",
-            "Condition": {
-                "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudfront::979188187252:distribution/E2FJ3WVV5KX73N"
-                }
-            }
-        },
-        {
-            "Sid": "AllowServerAccess",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::979188187252:user/edgenest-user"
-            },
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject"
-            ],
-            "Resource": "arn:aws:s3:::edgenest-output/*"
-        }
-    ]
-}
+4. for a viewer-request or origin-request, we can either modify the request and return it, so it reaches the destination its meant to or we can return immediate responses
+5. we must return a response object for viewer-response or origin-response.
+6. wildcard *.abcd.com and abcd.com can both be managed by different dns providers.
+7. dns resolver refers to the client sending the request to a particular domain(ex: google.com by me)
+8. when a user make a req to a domain(ex: google.com) with the supported TLS versions and algorithms, the server sitting behiend looks after it and verifies if the request follows the security standards it needs, if yes, connection is establlished, if not, nope. These algorightms are used to encrypt the communication between client and server.
