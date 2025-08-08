@@ -62,3 +62,66 @@ Date: 3 Aug 25
 6. wildcard *.abcd.com and abcd.com can both be managed by different dns providers.
 7. dns resolver refers to the client sending the request to a particular domain(ex: google.com by me)
 8. when a user make a req to a domain(ex: google.com) with the supported TLS versions and algorithms, the server sitting behiend looks after it and verifies if the request follows the security standards it needs, if yes, connection is establlished, if not, nope. These algorightms are used to encrypt the communication between client and server.
+
+Date 4 Aug 25
+
+1. Vercel doesn't use ECS tasks to deploy user projects from githubURL, they use firecracker(microvm) with ec2s to minimize the costs, so that they can do it in largescale.
+   1. `🧠 What is a MicroVM?
+      A MicroVM is like a tiny computer (VM) that:
+
+      Boots in 100 milliseconds
+
+      Can run Linux and Node.js
+
+      Is secure and isolated (like a mini-VM)
+
+      Is lightweight, so Vercel can run hundreds on one EC2 instance
+
+      🔥 Firecracker is the microVM tech they use
+      Created by AWS
+
+      Powers AWS Lambda, Fargate, and Vercel builds
+
+      Lets you run short-lived, safe environments at low cost`
+   2. it has 96% less lines of code than QEMU(what used by virtual box to create vms)
+   3. when you call a lambda function in aws, it spins up a microvm with required framework and all, then runs it.
+      1. cold start, if you haven't called it in a while, it'll shutdown the microvm and hence the next time you call it, it'll have to spin up first(which takes time, hence cold start)
+      2. warm start, if you've called lambda function recently, it'll have the microvm running(for certain time), hence it fullfills the requests right away.
+      3. `You → call Lambda
+                  ↓
+         [Cold]  → Create microVM
+                  → Load Node.js
+                  → Run function
+                  → Return response
+                  → Wait... then shut down
+
+         [Warm]  → Reuse microVM + Node.js
+                  → Run function
+                  → Done
+         ` 
+         refer `https://www.youtube.com/watch?v=BIRv2FnHJAg` for more
+2. blob stands for Binary Large Object
+3. if my frontend is on react(that doesn't need a continuos running service, just html, css), I don't need a ec2 instance to run it, just store it in s3, connect a domain and serve it over internet.
+
+Date 5 Aug 25
+
+1. Google cloud provides a speech to text api, that allows you to easily get the text out of an audio file (with confidence).
+2. Google offers
+   1. the Vision API's OCR method extracted text from an image, then the Translation API translated that text to English and the Natural Language API to found entities in that text. 
+   2. gcloud is the command-line tool for Google Cloud. It comes pre-installed on Cloud Shell and supports tab-completion.
+
+Date 6 Aug 25
+
+1. Java code runs on JVM, which includes JIT compiler, what it does is,
+   1. it optimises the code by converting the code to machine code, so people (in leetcode),
+   2. make static calls to the function enough times, so that it gets optimised, which run when the class is created.
+   3. ex: `
+            static
+            {
+               for(int i=0; i<500; i++)
+               {
+                     isAnagram("","a");
+               }
+            }
+         `
+   4. now isAnagram() is very optimised and converted to machine code.
