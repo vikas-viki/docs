@@ -148,3 +148,4 @@ Date 8 Aug 25
    1. buying bigger machine to optimise
 3. Horizontal Scaling
    1. buying more machines(same size) to optimise
+4. 
