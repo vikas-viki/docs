@@ -125,3 +125,26 @@ Date 6 Aug 25
             }
          `
    4. now isAnagram() is very optimised and converted to machine code.
+
+Date 8 Aug 25
+
+1. System design (high level)
+      1. First you create a top level architecture on whats happening on the system.
+      2. then you define what protocols to use to achieve it.
+      3. then you define the actions that can be performed in that system.
+      4. then you create a usecase design.
+      5. then you create classes
+      6. then you define sequence diagram (to define sequence of actions).
+   1. Vertical scaling
+      1. using same resources to optimise the thoughput and performance (buying t3.micro instead of t2.micro)
+   2. Horizontal scaling 
+      1. using more resources to optimise the throughput and performace (you create multiple servers(t2), instead of buying t3.micro)
+   3. Load balancer
+      1. its the one who maps the user requests to the services based on current conditions (who's free, who have more requests incoming at present and more).
+   4. De coupling
+      1. seperating concerns (ex: for pizza store, delivery system and pizza store to be seperate).
+
+2. Vertical scaling 
+   1. buying bigger machine to optimise
+3. Horizontal Scaling
+   1. buying more machines(same size) to optimise
