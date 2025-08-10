@@ -148,4 +148,72 @@ Date 8 Aug 25
    1. buying bigger machine to optimise
 3. Horizontal Scaling
    1. buying more machines(same size) to optimise
-4. 
+
+Date 10 Aug 25
+
+read `https://www.builder.io/blog/visual-guide-to-nodejs-event-loop` for clarifications (on below).
+1. When you set `'Cache-control', 'max-age=3600'` the browser caches the response and whenver (within 1hr(3600s)) a request is made to server the browser serves it directly, without hitting the server. The cache only works, when you're within the page and making ajax requests, not when everytime you reload.
+
+ex: 1mn requests came, this is the handler
+```js
+.get('/', (req, res) => {
+  fs.readFile('file.txt', () => {
+    console.log('File read done');
+    res.send('done');
+  });
+
+  let i = 0;
+  while (i < 1e9) i++; 
+  res.sendStatus(200);
+});
+```
+2. When an async I/O finishes before the CPU-heavy sync code finishes, will Node immediately process that async result, or will it first accept another request? 
+   1. first it accepts the request (but doesnt queue everything at once in callstack).
+   2. first it offloads the readfile to `libuv`, the starts performing while loop, once the while loop is done, it checks the queues, it finds that readFile is completed, so it uses the result and send the response to the user.
+3. Case: All synchronous
+   If handler code is purely synchronous (while loops, blocking CPU), Node.js cannot move to the next request until the current request finishes.
+
+   So 1 million requests arrive → they literally get handled sequentially in a single thread.
+
+   Even if the request is just while(i < 1e8) {}, all others wait in the TCP queue until the current event loop tick is free.
+
+4. Case: With async tasks (like fs.readFile, setTimeout, axios, etc.)
+   When the handler hits an async operation:
+
+   The work is offloaded to libuv’s thread pool or OS-level async API.
+
+   Node.js continues to the next request without waiting for it to complete.
+
+   When that async work is done, libuv schedules a callback in the event loop.
+
+5.   Request hits the server → Node.js enters your route handler.
+
+   fs.readFile('1gbfile.txt', ...)
+
+   This is asynchronous.
+
+   Node immediately delegates the file reading to libuv’s thread pool and moves on — it does not block waiting for the file.
+
+   The while loop (while (i < 1e9)) runs.
+
+   This is CPU-bound.
+
+   Since Node.js is single-threaded for JS execution, no other code runs until this finishes.
+
+   During this time, event loop is frozen — no I/O callbacks, no other requests.
+
+   After the loop ends, you call res.sendStatus(200).
+
+   This immediately sends the HTTP response to the client.
+
+   At this moment, Node doesn’t “check” if fs.readFile finished — it just follows the synchronous flow of your code.
+
+   Later, when fs.readFile finally finishes reading in the background, its callback gets pushed to the event loop queue.
+
+   But the request is already responded to, so calling res.send() inside that callback will either:
+
+   Throw an error ("Can't set headers after they are sent"), or be ignored, depending on framework and state.
+
+6. Nestjs 
+   1. Promise = one-and-done, response ends after one resolution.
+   2. Observable = can send multiple values over time, response ends only when completed.
