@@ -19,3 +19,23 @@ ex: [3,4,3,2,1] return 3
    5. in this way, we'll always find the loop if it exists
    6. TC: O(n)
    7. SC: O(1)
+```java
+public static void slowFast(int arr[]) {
+        int slow = arr[0];
+        int fast = arr[0];
+
+        do {
+            slow = arr[slow]; // to move once
+            fast = arr[arr[fast]]; // to move twice
+        } while (slow != fast);
+
+        slow = arr[0];
+        while (slow != fast) {
+            slow = arr[slow];
+            fast = arr[fast];
+        }
+
+        // there's a mathematical proof that this works at any linkedlist
+        System.out.println(slow);
+    }
+```

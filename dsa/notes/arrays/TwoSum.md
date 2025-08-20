@@ -19,3 +19,24 @@ ex: [2,5,7,11,15], target = 9, return [2,7]
       2. `we loop though from 0 to n-1, now we have first & target, now we know what we want a number that is = target - first (which is arr[i]), which exists in the array. so we use hashmap, which allows accessing values at O(1) time.`
    3. TC: O(n)
    4. SC: O(k) // no of unique elements
+
+```java
+public static void optimised(int arr[], int target) {
+        HashMap<Integer, Integer> mp = new HashMap<>();
+        int ans[] = new int[2];
+
+        for (int i = 0; i < arr.length; i++) {
+            int first = arr[i];
+            int second = target - first;
+
+            if (mp.containsKey(second)) { // even if we miss the first ele as ans[0], later the second ele will be
+                                          // found, which requires the earlier ele.
+                ans[0] = i;
+                ans[1] = mp.get(second);
+            }
+            mp.put(arr[i], i);
+        }
+
+        System.out.println(Arrays.toString(ans));
+    }
+```

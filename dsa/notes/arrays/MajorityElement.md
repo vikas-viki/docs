@@ -23,3 +23,21 @@ given majority element always exists.
     2. `Since the majority element is strictly more than n/2, no matter how many times it gets canceled(freq=0), it will eventually come back as the final candidate.`
     1. TC: O(n)
     2. SC: O(1)
+```java
+
+    public static void mooresVote(int arr[]) {
+        int freq = 0;
+        int ans = -1;
+        for (int i = 0; i < arr.length; i++) {
+            if (freq == 0) {
+                ans = arr[i];
+            }
+            if (ans == arr[i]) {
+                freq++;
+            } else {
+                freq--;
+            }
+        }
+        System.out.println(ans);
+    }
+```

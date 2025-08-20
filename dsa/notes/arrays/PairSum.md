@@ -19,3 +19,25 @@ Solutions:
       3. `if its more, we know we have to increase the totalsum, so we have to increment i to increase the value`
    4. TC: O(n)
    5. SC: O(1)
+
+```java
+public static void towPointer(int arr[], int target){
+        int start = 0;
+        int end = arr.length-1;
+        int ans[] = new int[2];
+
+        while(start < end){
+            int sum = arr[start] + arr[end];
+            if(sum > target){
+                end--;
+            }else if(sum < target){
+                start++;
+            }else {
+                ans[0] = arr[start];
+                ans[1] = arr[end];
+                break;
+            }
+        }
+        System.out.println(Arrays.toString(ans));
+    }
+```
