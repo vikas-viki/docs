@@ -36,7 +36,7 @@ first argument in obj (for `this` to refer to and res are the args passed to fun
 
 the only difference b/w call and apply is the way we pass args
 
-printName.call(name2, ["India"]); we use array
+printName.apply(name2, ["India"]); we use array
 
 # bind
 
