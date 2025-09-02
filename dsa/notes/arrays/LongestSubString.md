@@ -15,7 +15,7 @@ find substring of unique characters of max length, out of available options.
    1. we'll use two pointer with sliding window approach
    2. starting from s=0,r=0
       1. check if map[str[r]] > l (map will store indices)
-         1. if so (it meanse, it came somewhere before in l->r), we can't take tihs as a substring, move the l to map[str[r]] + 1 (next place to wherever it came from).
+         1. if so (it meanse, it came somewhere before in l->r), we can't take this as a substring, move the l to map[str[r]] + 1 (next place to wherever it occurred before).
       2. else i can take this as a string, maxL = max(maxL, r-l+1)
       3. add the character str[r] to the map.
       4. keep incrementing r. 

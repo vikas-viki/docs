@@ -20,7 +20,7 @@ Output: 1024.00000
 ```java
 
     public static double myPow(double x, int n) {
-        int exp = n;
+        long exp = n;
 
         if (exp < 0) { // x^-n => 1/(x^n)
             x = 1 / x;

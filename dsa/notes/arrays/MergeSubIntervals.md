@@ -13,7 +13,7 @@ Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
 1. Brute force
    1. sort based on first element, if equal, based on second element.
    2. take a loop from 0 to n, 
-      1. take it a iPair
+      1. take it as iPair
       2. if the i pair overlaps the previous pair, continue.
       3. take another loop to i+1 to n
          1. check if jpair overlaps the current ipair, if so merge it.
