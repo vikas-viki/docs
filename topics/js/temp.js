@@ -1,28 +1,16 @@
-var a = 1;
-function callb() {
-    console.log("nextTick");
-    if (a++ >= 10) return;
-    process.nextTick(() => {
-        callb();
+const { setTimeout: delay } = require('node:timers/promises');
+
+const promise = delay(1000).then(() => 'First task completed');
+
+promise
+    .then(result => {
+        console.log(result); // 'First task completed'
+        return delay(1000).then(() => 'Second task completed'); // Return a second Promise
     })
-
-}
-
-abcd();
-
-process.nextTick(callb);
-
-function abcd() {
-    console.log("this is an abcd call!");
-}
-
-
-
-async function cdsa() {
-    console.log("this is async func");
-    Promise.resolve().then(() => {
-        console.log("this is inside promise!");
+    .then(result => {
+        console.log(result); // 'Second task completed'
     })
-}
-
-cdsa();
+    .catch(error => {
+        console.error(error); // If any Promise is rejected, catch the error
+    });
+setTimeout(3000);
