@@ -1,11 +1,7 @@
-console.log("start");
+import { setTimeout } from "node:timers/promises";
 
-setTimeout(() => {
-    process.nextTick(() => {
-        console.log("tick");
-    })
-}, 1000);
+console.log("before");
 
-setTimeout(() => {
-    console.log("other");
-}, 1000);
+await setTimeout(2000);
+
+console.log("after");
