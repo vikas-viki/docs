@@ -1,4 +1,4 @@
-In Node.js, a “tick” means one iteration (one cycle) of the event loop.
+In Node.js, a “tick” means one iteration (one cycle/one thing that event loop processes, like pushing the setTimeout to callstack can be said as 1 tick) of the event loop.
 
 Current tick = the synchronous stuff you’re running right now (your script, or the current callback that the event loop picked).
 
