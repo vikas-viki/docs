@@ -69,3 +69,19 @@ Scoring & Insights Service        - Analyze candidate responses post-interview u
 - Store results in DB for HR dashboard
 - Handle retries if AI call fails
 - Optional summarization of long interviews
+
+
+
+## how interview would work
+
+this is after job match
+
+1. the clicks "start interview"
+2. the db created a session with id for that specific interview and inserts in to db and redis.
+3. candidate is directly connected to interview microservices (given it has the session id the db just created above alogn with max timer)
+4. interview orchestrator creates an ecs task (along with required data like, job reqs, resume, questions) that handles the interview (qnas) and fault tolerance, and ecs managing.
+5. ecs task is responsible for conversating with candidate asking questions one by one and updating details in redis accordingly and handling, answering any questions by candidate and keeping the flow.
+6. no both interview orchestrator and ecs task is connected with client, if anything goes wrong in ecs task, let say it disconnects or crashes, interview orchestrator spins up another ecs tasks, feeds the update  and continues with the interview.
+7. once completed, details are stored in db and used for further processing if any.
+
+but i'm thinking, spinning up is ecs is slow na.
