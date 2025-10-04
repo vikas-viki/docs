@@ -28,6 +28,9 @@ you tell the kubernetes api to spin up 2 instances.
 
 here the control pane & worker nodes are seperate physical machines (like you own local machine or cloud ones like ec2), you may have as many worker nodes as you want.
 
+### api-server
+api server is what as a developer i am connected to.
+
 ### control pane
 it makes descision on scheduling, detecting and responding to events and all.
 
@@ -41,7 +44,15 @@ etcd is highly available key-value store used by k8s to store cluster info.
 Control plane component that watches for newly created Pods with no assigned node, and selects a node for them to run on.
 
 ### kube-controller-manager 
-Logically, each controller is a separate process, but to reduce complexity, they are all compiled into a single binary and run in a single process.
+Logically, each controller is a separate process, but to reduce complexity, they are all compiled into a single binary and run in a single process. controller is the one that constantly checks user requirements like if all the nodejs are running have anyone died are pods healthy.
+it's not one process, but a bunch of constantly running processes that have a certain job.
+- Node controller: responsible for noticing and responding when a node goes down (then it re-schedules it)
+there are other controllers like `deployment controller`
+we can define our own controller that does a specific job that we define (when we reach operator pattern).
+
+
+### kube cloud controller manager
+that talks to the cloud the k8s cluster is hosted in and talks to the underlying cloud(like aws, gcp...)
 
 There are many different types of controllers. Some examples of them are:
 
@@ -54,3 +65,90 @@ The above is not an exhaustive list.
 ### CRI (container runtime interface)
 these are the components you need to run the containers, 
 like if you want to run docker container, you need docker engine.
+
+
+# from 100x Devs
+
+orchestration(orchestra) comes from (a musician who guides other musicians how to perform, what to do)
+
+### nodes
+every machine running inside a k8s cluster(one or more nodes) is called a node.
+
+### master node
+the node thats responsible for schedule, heal, deploy containers (on worker nodes), listening to dev and doing stuff.
+it has
+- api-server
+- etcd 
+- kube-scheduler
+- kube-controller-manager
+
+### worker node
+it has two jobs.
+it runs the containers that master node schedules.
+it constantly polls master node to check if there are any jobs for me.
+- kubelet (an agent that polls master to run containers)
+- kube-proxy  (responsible for making your apps be talked by world)
+- container runtime (this is where your docker/cri.o/containerD or other container runs.)
+
+
+## POD
+a pod is smallest and simplest unit in the kubernetes object that you can create or deploy.
+a pod runs inside the worked node which can run one or more docker containers and each worker node can run one or more pods.
+
+`why pod when you have containers ?`
+the thing is you can group two or more containers to run in a single pod, if you run them indidvidually, they might run in different machines which you might not want.
+
+to create a k8s cluster you can use `kind` or `minicube`
+
+# install kind
+
+1. run `kind create cluster` that creates one cluster with one master node.
+
+
+2. create yml file with 
+```yml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+```
+
+then run `kind create cluster --config cluster.yml --name local` that creates 1 master and two worker nodes.
+
+now if you need to connect to it, you need credentials which are stored in `~/.kube/config` which kubectl uses and makes things possible for us easily.
+
+then you can create pod like `kubectl create pod`
+
+use `kubectl get nodes`, `kubectl get pods`
+
+you can create a pod using 
+`kubectl run nginx --image=nginx --port=80`
+
+you can get the logs of the pod using
+
+`kubectl logs nginx`
+
+to delete a pod 
+`kubectl delete pod nginx`
+
+**there's another way to create pod**
+wherein you define a yaml file to have pods, containers all specified in one file.
+
+like
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+```
+
+then run `kubectl apply -f manifest.yml`
