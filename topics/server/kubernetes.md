@@ -268,3 +268,30 @@ spec:
 ```
 
 now when you apply this, your service will serve the pod in that port, but since everything is running inside docker, you need to map ports off you system to docker workers/master to access it.
+
+this specifies that this service serves the nodes port 30007 and port 80 of the pod running inside it.
+
+
+kind.yml file
+```yml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30007
+    hostPort: 30007
+- role: worker
+- role: worker
+```
+
+this says master's(control-plane) port 30007 is accessible by host(my machine)'s 30007 port.
+
+In Kubernetes, a "Service" is an abstraction that defines a logical set of Pods and a policy by which to access them. Kubernetes Services provide a way to expose applications running on a set of Pods as network services. Here are the key points about Services in Kubernetes:
+Key concepts
+Pod Selector: Services use labels to select the Pods they target. A label selector identifies a set of Pods based on their labels.
+Service Types:
+ClusterIP: Exposes the Service on an internal IP in the cluster. This is the default ServiceType. The Service is only accessible within the cluster.
+NodePort: Exposes the Service on each Node’s IP at a static port (the NodePort). A ClusterIP Service, to which the NodePort Service routes, is automatically created. You can contact the NodePort Service, from outside the cluster, by requesting <NodeIP>:<NodePort>.
+LoadBalancer: Exposes the Service externally using a cloud provider’s load balancer. NodePort and ClusterIP Services, to which the external load balancer routes, are automatically created.
+Endpoints: These are automatically created and updated by Kubernetes when the Pods selected by a Service's selector change.
