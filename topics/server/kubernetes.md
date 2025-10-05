@@ -282,10 +282,13 @@ nodes:
   - containerPort: 30007
     hostPort: 30007
 - role: worker
+  extraPortMappings:
+  - containerPort: 30008
+    hostPort: 30008
 - role: worker
 ```
 
-this says master's(control-plane) port 30007 is accessible by host(my machine)'s 30007 port.
+this says master's(control-plane) port 30007 is accessible by host(my machine)'s 30007 port. if you want your workers to have the ports opened to host as well then you can specify it in extraPortMappings.
 
 In Kubernetes, a "Service" is an abstraction that defines a logical set of Pods and a policy by which to access them. Kubernetes Services provide a way to expose applications running on a set of Pods as network services. Here are the key points about Services in Kubernetes:
 Key concepts
@@ -295,3 +298,107 @@ ClusterIP: Exposes the Service on an internal IP in the cluster. This is the def
 NodePort: Exposes the Service on each Node’s IP at a static port (the NodePort). A ClusterIP Service, to which the NodePort Service routes, is automatically created. You can contact the NodePort Service, from outside the cluster, by requesting <NodeIP>:<NodePort>.
 LoadBalancer: Exposes the Service externally using a cloud provider’s load balancer. NodePort and ClusterIP Services, to which the external load balancer routes, are automatically created.
 Endpoints: These are automatically created and updated by Kubernetes when the Pods selected by a Service's selector change.
+
+
+### NOTE
+for a service to be exposed on internet, 
+the ports must be specified in the cluster config before starting so that the cluster know what ports it exposes (only for local k8s but for global ones, servies are enough).
+
+they you create a deployment where you specify the ports each container expose
+
+then you create a service that actually maps the node's port to the container port 
+
+For NodePort service:
+targetPort = container port inside pod
+port = port inside the Service object (cluster-internal)
+nodePort = port on the node that forwards to targetPort
+
+For LoadBalancer service:
+NodePort may exist under the hood, but external IP + cloud LB forwards traffic.
+
+For ClusterIP service:
+Only accessible inside cluster, no node mapping needed.
+
+a cluster which you create using kind is nothing more than a docker container.
+
+### note
+you might have a question.
+let say two pods each running nginx exposing port 80 on the same node, when we create a service that maps 30007(node's port) to 80(pod's port), which pod it'll point to ?
+
+the answer is there's a internal load balancer that decides this, if its only 1 pod, it'll send it to it, but if there are more than 1, first it'll match all the pods with that matching label, then forwards to one of them based on the load.
+
+
+each pod inside the node gets its own ip
+
+when you define a ip inside the deployment, its just for documentation, but actual mapping is done by service only.
+
+if you dont map any ports from nginx containers to host, a host can run as many nginx containers as he want na, but both containers cant listen on same port of the same host.
+
+If you don’t create a Service, the container is only reachable by other pods in the cluster via pod IP.
+
+```yml
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80        # <--- service port
+      targetPort: 80  # <--- pod/container port
+      nodePort: 30007
+```
+Service port is the port other pods in the cluster use to talk to this service.
+
+```
+User / External Client
+        │
+        ▼
+NodePort (optional) or LoadBalancer IP
+        │  (nodePort maps host port → service port)
+        ▼
+Service (clusterIP)
+  - servicePort = port clients/pods use to reach the service
+  - targetPort  = port on pod/container receiving traffic
+        │
+        ▼
+Pod IP + targetPort
+        │
+        ▼
+Container listening on containerPort
+```
+
+ex: 
+
+```yml
+containers:
+- name: nginx
+  image: nginx
+  ports:
+  - containerPort: 80
+```
+
+```yml
+ports:
+  - port: 8080       # service port
+    targetPort: 80   # pod/container port
+    nodePort: 30007  # optional
+type: NodePort
+```
+
+```
+User → http://<node-ip>:30007 → servicePort 8080 → pod IP:80 → nginx container listens on 80
+```
+
+so cluster is just a name for group of one of more machine, nothing sitting infront of node and world
+
+[Internet] 
+   |
+   v
+[node IP + NodePort]  <-- Node is actual machine
+   |
+   v
+[ClusterIP]            <-- internal routing inside cluster
+   |
+   v
+[Pods/Containers]
+
+
+each container inside the pod, runs like how you'd run a docker container on host network, like they share same ip and no two processes can share port inside the pod/of the pod
