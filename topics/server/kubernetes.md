@@ -185,3 +185,86 @@ spec:
         ports:
         - containerPort: 80
 ```
+
+the template here specifies the metadata, which is a label `app` that's set to `nginx`. 
+and the spec, specification specifies how many containers to run, what's the image, what port it exposes and all
+
+the selector section is used by deployment to see, what are the pods that I have to keep looking after such that if one crashes, create another, which is done by matching labels specified in it.
+
+it 3 replicas(copies) of it. let say then you manually create another pod (with same label), the deployment will delete it cause **it only looks after the deployment config it has**, which is, it needs to run 3 replicas, so I have to delete new one. If you delete one of them, it'll create one.
+
+**the deployment doesn't create pods itself, it create replicaset first and then replicaset creates pods for us**
+
+Deployment => Replicaset => pods.
+
+
+## Replicaset
+its a controller that ensures specified number of pod replicas are running at any given time.
+
+let's create replicaset
+
+```yml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replicaset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+then you can create replica set using 
+`kubectl apply -f kubectl-rs.yml`
+
+it does the same thing as deployment, then why do we need deployment.
+
+
+### deployment use
+one feature deployment gives you is `rolling updates`.
+meaning iff you modify the same deployment file and re-apply it, it first creates a replicaset, ensures it's healthy then it slowly starts moving traffic from first pod to new one and then it slowly deletes the old replicaset. its like `blue-green-deployment`
+
+**deployment gives you rolling updates, but if you only were using replicaset, you'd manually have to migrate from pods a to b**
+
+## exposing app to internet.
+
+you need a service that exposes your pod to internet.
+
+### service in k8s
+it defines how can you visit the pod/container running inside it, by defining, what port makes call to which pod which makes call to which container port.
+
+there are more types of services like 
+- nodeport
+- cluster IP
+- loadbalancer
+
+like
+
+```yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30007  # This port can be any valid port within the NodePort range (30,000 - 30,200)
+  type: NodePort
+```
+
+now when you apply this, your service will serve the pod in that port, but since everything is running inside docker, you need to map ports off you system to docker workers/master to access it.
