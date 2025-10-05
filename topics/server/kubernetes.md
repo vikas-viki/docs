@@ -114,7 +114,7 @@ nodes:
 - role: worker
 - role: worker
 ```
-
+**kind let's you create the cluster, kubectl lets you manage them easily.**
 then run `kind create cluster --config cluster.yml --name local` that creates 1 master and two worker nodes.
 
 now if you need to connect to it, you need credentials which are stored in `~/.kube/config` which kubectl uses and makes things possible for us easily.
@@ -152,3 +152,36 @@ spec:
 ```
 
 then run `kubectl apply -f manifest.yml`
+
+
+## jargon
+
+### deployment
+A Deployment in Kubernetes is a higher-level abstraction that manages a set of Pods and provides declarative updates to them. It offers features like scaling, rolling updates, and rollback capabilities, making it easier to manage the lifecycle of applications.
+ 
+let say you want to create 4 pods the same time, you'd use deployment cmd.
+
+let say you create 4 pods, normally, manually, whenever one goes down, it doesnt restart (it doesn only at 1 pod level), but in deployment it'll handle everything.
+
+an example deployment yml
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
