@@ -7,9 +7,32 @@
     <title>Document</title>
 </head>
 
+</body><button id="startBtn">Start Listening</button>
 <body>
 
-</body>
-<script src="./index.js"></script>
+<script>
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map(result => result[0].transcript)
+      .join('');
+    console.log('Transcript:', transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+  };
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    recognition.start();
+  });
+</script>
+
 
 </html>

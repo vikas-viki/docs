@@ -401,4 +401,22 @@ so cluster is just a name for group of one of more machine, nothing sitting infr
 [Pods/Containers]
 
 
-each container inside the pod, runs like how you'd run a docker container on host network, like they share same ip and no two processes can share port inside the pod/of the pod
+each container inside the pod, runs like how you'd run a docker container on host network, like they share same ip and no two processes can share port inside the pod/of the pod.
+
+In Kubernetes, a LoadBalancer service type is a way to expose a service to external clients. When you create a Service of type LoadBalancer, Kubernetes will automatically provision an `external`(its not part of k8s cluster its provided by cloud provider.) load balancer from your cloud provider (e.g., AWS, Google Cloud, Azure) to route traffic to your Kubernetes service.
+
+
+its just acts like an entrance to your cluster nodes, so that ppl from internet dont get to hit your nodes directly rather they hit loadblancer.
+
+`we cant create a loadbalancer locally cause there's no cloud for k8s to talk to and create a loadbalancer`
+
+In clouds (AWS/GCP/Azure), when you do:
+
+kind: Service
+spec:
+  type: LoadBalancer
+
+
+Kubernetes asks the cloud provider’s API:
+“Hey, give me a public load balancer and connect it to my NodePorts.”
+The cloud provider spins up something like AWS ELB / GCP LB.
