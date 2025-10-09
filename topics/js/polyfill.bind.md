@@ -26,3 +26,15 @@ let printMyCity = printCity.myBind(user);
 
 printMyCity("India");
 ```
+
+```js
+Array.prototype.myMap = function (cb, thisArg){
+    let result = [];
+    for(let i =0; i < this.length; i++){
+        if(i in this){ // i is a property in array, just like objects.
+            result.push(cb.call(thisArg, this[i], i, this));
+        }
+    }
+    return result;
+}
+```

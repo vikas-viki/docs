@@ -14,7 +14,13 @@
 - Each **TCP connection** (HTTP request, WebSocket, etc.) consumes **one file descriptor**.  
 - If `ulimit -n = 1024`:
   - Node.js process can have at most **1024 open sockets/files simultaneously**.
-  - Once this limit is reached, **new connections are refused** until some close.
+  - Once this limit is reached, **new 
+  2. **Memory per connection** — each connection usually takes ~4–8 KB, depending on available system/process memory.
+
+## 4. Implications
+- If too many connections are held open slowly (e.g., via slow clients), the server can become overwhelmed.  
+- This is the principle behind a **Slowloris-style attack**, which is why proper timeouts and connection limits are important.
+connections are refused** until some close.
 
 ---
 

@@ -26,7 +26,7 @@ async function handleAxiosErrors<T extends (...args: any[]) => Promise<any>>(
 
 ```
 
-**`Polyfill for map`**
+**`Polyfill for filter`**
 
 ```js
 Array.prototype.newFilter = function (callback, thisArg) {

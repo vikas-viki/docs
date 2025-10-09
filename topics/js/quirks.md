@@ -33,9 +33,6 @@ Fun, tricky, and surprising questions for quick revision & interviews.
 9. `console.log([] + {})`  
    **Answer:** `"[object Object]"` — object stringified.
 
-10. `console.log({} + [])`  
-    **Answer:** `0` — `{}` parsed as block, `+[]` → 0.
-
 11. `console.log(typeof null)`  
     **Answer:** `"object"` — a historical JS bug.
 

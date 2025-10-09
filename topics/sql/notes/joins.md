@@ -24,6 +24,19 @@
 -   Requires table aliases to differentiate the two "copies" of the same
     table.
 
+### CROSS JOIN
+
+let say you want each combination of both table combined, but there's no common key columns, then you can use cross join.
+
+```sql
+select
+    a.student_id,
+    a.student_name,
+    b.subject_name,
+from students a
+cross join subjects b;
+```
+
 ### Joining Multiple Tables
 
 -   Multiple `JOIN` clauses can be chained.\

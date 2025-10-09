@@ -65,3 +65,7 @@ This continues until it reaches null (end of chain).
 3. the same way, if you want anytihng to inherit anything else, you can just this. But this wont work for primitives (Number, String, BigInt, Booleanm, Symbol, undefined and null)
    1. In JavaScript, the primitive types are the ones that are not objects and are immutable (their value can’t be changed in place).
    2. the changes to prototype will be global to the current session/lifetime of a nodejs/browser process.
+
+
+**`Everything in JS (except primitives) are objects comes from this prototypal inheritance concepts itself.`**
+`functions are not object they have a special trait that, they are callable.`
