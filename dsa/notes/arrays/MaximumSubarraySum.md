@@ -7,7 +7,7 @@ Explanation: The subarray [4,-1,2,1] has the largest sum 6.
 
 Note: subarray is the one that goes only forward (it doesnt come to start after it goes to end)
 
-1. Bruteforce: 
+1. Bruteforce:
    1. `start looping from start to end, take each index as a start of the array, take a nest loop that goes from current start till end and add up the values to a variable and keep updating the max value on each nested iteration`
    2. TC: O(n^2)
    3. SC: O(1)
