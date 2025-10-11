@@ -266,3 +266,65 @@ User → LoadBalancer → Node → kube-proxy → Service → Pod → Container
 ### Loadbalancers
 * a loadbalancer lets you route the requests of user to the pods maintaining the consistent ips.
 * like, a nodeport service's actual node's ip might change but not loadbalancer's
+
+### Cluster IP service
+* look after use of clusterip service is ingress file.
+
+
+### Name spaces
+namespaces allow you to seperate clusters.
+
+let's say you are in a big company that has over 1000s of nodes in 1 cluster and you are part of one specific app that has only 3 nodes running, now for you to be able to find your 3 ones in them, the easiest and production meant way is to create seperate name space for your nodes such that you can get details by using your namespace.
+
+so namespace in general allow you to do "seperation of concerns"
+
+In Kubernetes, a namespace is a way to divide cluster resources between multiple users/teams. Namespaces are intended for use in environments with many users spread across multiple teams, or projects, or environments like development, staging, and production.
+
+**Creating namespace**
+```bash
+kubectl create namespace backend-team
+```
+
+specifying it in manifest json
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: backend-team
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+```bash
+kubectl apply -f deployment-ns.yml # to create deployment in that namespace.
+kubectl get pods -n backend-team # to get deployments of that namespace.
+```
+
+**setting context**
+now you'll have to specify name space each time, to set a default context, you can do 
+```bash
+kubectl config set-context --current --namespace=backend-team
+# to change to default
+kubectl config set-context --current --namespace=default
+```
+
+
+### Config maps
+config maps are just manifest files that store details on key values pairs, that are as important as secrets to run your application, but need not be that secret, like your `cache-size`, this need not be a secret variable, but it's needed for you to run the app.
+
+`one more benifit is that, you can use these file to pass env variable/config variables while creating deployments, no need to manually pass the vaiables every time.`
+
+You create this same as deployments, but of type `ConfigMap`, unlike `LoadBalancer`, `ClusterIP`, `NodeService` and more, which you can store in volumes.
