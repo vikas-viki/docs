@@ -323,8 +323,90 @@ kubectl config set-context --current --namespace=default
 
 
 ### Config maps
+ConfigMap is a Kubernetes resource for storing non-sensitive configuration data in key-value format.
 config maps are just manifest files that store details on key values pairs, that are as important as secrets to run your application, but need not be that secret, like your `cache-size`, this need not be a secret variable, but it's needed for you to run the app.
 
 `one more benifit is that, you can use these file to pass env variable/config variables while creating deployments, no need to manually pass the vaiables every time.`
+Pods can consume it in two main ways:
+- As environment variables
+- As files via a volume mount
 
 You create this same as deployments, but of type `ConfigMap`, unlike `LoadBalancer`, `ClusterIP`, `NodeService` and more, which you can store in volumes.
+
+```yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-map
+data:
+  app.env: |
+    APP_NAME=EdgeNest
+    APP_ENV=production
+  message.txt: "Hello from ConfigMap!"
+```
+
+### Secrets
+A Secret is just another Kubernetes resource, like a Pod or ConfigMap. All Kubernetes cluster state — including Secrets — is stored in a key-value store called etcd.
+
+Just like hostPath, configMap, or persistentVolumeClaim, you can directly mount a Secret as a volume in a Pod.
+You have to make all the value base64 cause, Base64 ensures that binary data, special characters, or newlines can be safely stored in YAML.
+the way you create them is 
+```yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=        # "admin" # this is a seperate file
+  password: cGFzc3dvcmQ=    # "password" # this is a seperate file
+```
+
+
+### Volumes & Volume mounts
+A volume is persistent storage attached to a container.
+Think of it as a folder on the host machine (or cloud storage) that the container can read/write to — and that survives restarts, crashes, and redeploys.
+
+`volume` is where you store/define the data and `volume mount` is the way for container/anyone to mount(get) that volume(which is a files or set of files) in to the current container folder or something.
+
+the way you define it is like below
+
+```yml
+volumes:                  # 1️⃣ Define the volume (the storage source)
+  - name: secret-volume     # a deployment file of k8s may not have containers at all, but it can have volumes alone.
+    secret:
+      secretName: db-credentials
+  - name: app-config
+      configMap:
+        name: app-config-map
+
+containers:
+  - name: app
+    image: nginx
+    volumeMounts:         # 2️⃣ Mount it into the container
+      - name: secret-volume # for a container to mount(get) volume it must be defined as cluster in the volume.
+        mountPath: /app/config # Be careful with mount path, it might replace the whole folder with just mounted data, replacing the whole app.
+      - name: app-config
+        mountPath: /app/config/config
+```
+
+You can use the type `Secret` service in k8s to create a secrects volume in k8s.
+
+
+### usecase of Secrets/ConfigMaps
+- Separation of code and secrets
+Without Secrets, you might hardcode passwords in your app or Docker image — bad practice.
+With Secrets, your container image stays generic; credentials are injected at runtime.
+
+- Centralized management
+One Secret can be mounted into multiple Pods.
+Updating the Secret updates all Pods that use it (with some caveats).
+
+- Secure injection
+Secrets can be mounted as:
+Files in a volume → temporary in-memory files (tmpfs)
+Environment variables → read directly by the container app
+This avoids storing sensitive data on disk in your image.
+
+- Access control
+Kubernetes RBAC ensures only authorized Pods/ServiceAccounts can read the Secret.
