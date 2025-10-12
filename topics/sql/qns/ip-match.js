@@ -32,3 +32,15 @@ order by invalid_count desc, ip desc;
 
 // ^ signifies the start
 // $ signifies the end
+
+// email match
+`
+# Write your MySQL query statement below
+select
+    user_id,
+    name,
+    mail
+from users
+where
+    regexp_like(mail, '^[A-Za-z](?:[A-Za-z0-9._-]*)@leetcode\\.com$', 'c');
+`

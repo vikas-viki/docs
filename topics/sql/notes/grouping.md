@@ -88,3 +88,16 @@ select * from employee_demographics order by 5, 4; # based on column no's (1 bas
 
 👉 Retrieves all rows and sorts them by the 5th column, then the 4th
 column, in ascending order by default.
+
+
+**If you want to concat all the strings of a particular column after groping, you'd use group_concat, like below**
+
+```sql
+select 
+    sell_date,
+    count(distinct product) as num_sold,
+    group_concat(distinct product order by product separator ',') as products
+from activities 
+group by sell_date
+order by sell_date;
+```
